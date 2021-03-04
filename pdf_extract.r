@@ -2,6 +2,8 @@
 library(tidyverse)
 library(pdftools)
 library(stringi)
+library(rnrfa)
+library(leaflet)
 
 # Creating a vector of PDF files names using the list.files function. The pattern argument says to only grab those files ending with "pdf"
 # Extract direct from URLS
@@ -38,7 +40,19 @@ ls_out <- lapply(2:pages, function(x) {
   cons_score <- scores[1]
   threat_score <- scores[2]
   threat_rate <- gsub('^.*Threat rating and score\\s*|\\s*[0-9]+.*$', '', cl)
-  df <- data.frame(site_id, woodland_name, area, cons_rate, cons_score, threat_rate, threat_score)
+  
+  # Get grid ref & convert to lat-long
+  grid_line <- grep("Grid ref.", plines)
+  gl <- str_squish(plines[grid_line])
+  gref <- gsub('^.*Grid ref. \\s*|\\s*6 inch sheet.*$', '', gl)
+  coord <- rnrfa::osg_parse(grid_refs = paste0("I", gref), coord_system = "WGS")
+  lat <- coord$lat
+  lon <- coord$lon
+  
+  # Format to datafram
+  df <- data.frame(site_id, lat = lat, lon = lon, woodland_name, area, cons_rate, cons_score, threat_rate, threat_score)
+  
+  print(x)
   
   return(df[1, ])
   
@@ -56,4 +70,9 @@ ggplot(df) +
   scale_color_gradientn(colors = terrain.colors(7)) +
   scale_x_log10()
 
+# testing leaflet maps
+m <- leaflet() %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(lng=df$lon, lat=df$lat)
+m  # Print the map
 
