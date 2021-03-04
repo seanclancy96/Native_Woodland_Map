@@ -51,8 +51,9 @@ str(df)
 
 # simple plot
 ggplot(df) +
-  geom_point(aes(area, cons_score, shape = cons_rate)) +
+  geom_point(aes(area, cons_score, shape = cons_rate, color = threat_score)) +
   facet_wrap(~threat_rate) +
+  scale_color_gradientn(colors = terrain.colors(7)) +
   scale_x_log10()
 
 
