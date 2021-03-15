@@ -91,5 +91,8 @@ ggplot(df) +
 # testing leaflet maps
 m <- leaflet(df) %>%
   addTiles() %>%  # Add default OpenStreetMap map tiles
-  addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name))
+  addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), 
+             popup = ~paste0(woodland_name, "<br/>Conservation status: ", cons_rate, 
+                             "<br/>Threat status: ", threat_rate, 
+                             "<br/>Area (hectares): ", area))
 m  # Print the map
