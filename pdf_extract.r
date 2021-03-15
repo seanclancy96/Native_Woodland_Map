@@ -94,5 +94,5 @@ m <- leaflet(df) %>%
   addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), 
              popup = ~paste0(woodland_name, "<br/>Conservation status: ", cons_rate, 
                              "<br/>Threat status: ", threat_rate, 
-                             "<br/>Area (hectares): ", area))
+                             "<br/>Area: ", area, " hectares"))
 m  # Print the map
