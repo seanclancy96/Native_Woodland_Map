@@ -4,6 +4,7 @@ library(pdftools)
 library(stringi)
 library(rnrfa)
 library(leaflet)
+library(htmltools)
 
 # Extract directly from URLS
 urls <- c("https://www.npws.ie/sites/default/files/publications/pdf/Perrin_et_al_2008_NSNW_V3a.pdf",
@@ -88,8 +89,7 @@ ggplot(df) +
   scale_x_log10()
 
 # testing leaflet maps
-m <- leaflet() %>%
+m <- leaflet(df) %>%
   addTiles() %>%  # Add default OpenStreetMap map tiles
-  addMarkers(lng=df$lon, lat=df$lat)
+  addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name))
 m  # Print the map
-
