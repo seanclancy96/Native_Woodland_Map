@@ -93,15 +93,23 @@ df <- rbind(df1,df2,df3,df4) # Binding these data together
 df
 str(df)
 
+# Changing empty ownership names to Not Stated
+levels(df$ownership)[levels(df$ownership)==""] <- "Not Stated"
+
+# Taking non-private woods only
+df_non_private <- df %>% 
+  filter(!grepl("Private", ownership)) 
+
+# Taking definite non-private woods
+df_public_confirmed <- df_non_private %>% 
+  filter(!ownership %in% "Not Stated")
+
 # simple plot
 ggplot(df) +
   geom_point(aes(area, cons_score, shape = cons_rate, color = threat_score)) +
   facet_wrap(~threat_rate) +
   scale_color_gradientn(colors = terrain.colors(7)) +
   scale_x_log10()
-
-# Changing empty ownership names to Not Stated
-levels(df$ownership)[levels(df$ownership)==""] <- "Not Stated"
 
 # Map of all woods
 m <- leaflet(df) %>%
@@ -114,11 +122,7 @@ m <- leaflet(df) %>%
                              "<br/>Ownership: ", ownership))
 m  # Print the map
 
-# Taking non-private woods only
-df_non_private <- df %>% 
-  filter(!grepl("Private", ownership)) 
-
-# Map of all woods
+# Map of non private woods
 m_nonpriv <- leaflet(df_non_private) %>%
   addTiles() %>%  # Add default OpenStreetMap map tiles
   addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), 
@@ -129,11 +133,7 @@ m_nonpriv <- leaflet(df_non_private) %>%
                              "<br/>Ownership: ", ownership ))
 m_nonpriv  # Print the map
 
-# Taking definite non-private woods
-df_public_confirmed <- df_non_private %>% 
-  filter(!ownership %in% "Not Stated")
-
-# Map of all woods
+# Map of all non-private woods excluding not stated ownership
 m_public_confirmed <- leaflet(df_public_confirmed) %>%
   addTiles() %>%  # Add default OpenStreetMap map tiles
   addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), 
@@ -143,7 +143,4 @@ m_public_confirmed <- leaflet(df_public_confirmed) %>%
                              "<br/>Area (ha): ", area, 
                              "<br/>Ownership: ", ownership ))
 m_public_confirmed  # Print the map
-
-
-
 
