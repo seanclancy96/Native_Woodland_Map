@@ -100,7 +100,7 @@ ggplot(df) +
   scale_color_gradientn(colors = terrain.colors(7)) +
   scale_x_log10()
 
-# testing leaflet maps
+# Map of all woods
 m <- leaflet(df) %>%
   addTiles() %>%  # Add default OpenStreetMap map tiles
   addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), 
@@ -111,5 +111,19 @@ m <- leaflet(df) %>%
 m  # Print the map
 
 # Taking non-private woods only
-df %>% filter(!grepl("Private", ownership))
-filter(df, !grepl("Private",TrackingPixel))
+df_non_private <-df %>% 
+  filter(!grepl("Private", ownership))
+
+# Map of all woods
+m_nonpriv <- leaflet(df_non_private) %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), 
+             popup = ~paste0(woodland_name, "<br/>Conservation status: ", cons_rate, 
+                             "<br/>Threat status: ", threat_rate, 
+                             "<br/>Area (ha): ", area, 
+                             "<br/>Ownership: ", ownership ))
+m_nonpriv  # Print the map
+
+
+
+
