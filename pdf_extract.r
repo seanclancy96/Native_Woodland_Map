@@ -42,15 +42,15 @@ ls_out <- function(pdf_id){
     wl <- str_squish(plines[wl_line])
     woodland_name <- gsub('^.*Woodland name\\s*|\\s*Townland.*$', '', wl)
     
+    # Extract townland name
+    twn_line <- grep("Townland name", plines)
+    twn <- str_squish(plines[twn_line])
+    townland_name <- gsub('^.*Townland name\\s*|\\s*Conservation.*$', '', twn)
+    
     # Extract whether it is a public or private wood
     own_line <- grep("Ownership", plines)
     own <- str_squish(plines[own_line])
     ownership <- gsub('^.*Ownership\\s*|\\s*Area.*$', '', own)
-    
-    # Field notes
-    nts_line <- grep("Ownership", plines)
-    nts <- str_squish(plines[nts_line])
-    notes <- gsub('^.*External data source: not all data recorded\\s*|\\s*Site no.*$', '', nts)
     
     # Extract Area
     area_line <- grep("Area", plines)
@@ -74,7 +74,7 @@ ls_out <- function(pdf_id){
     lon <- coord$lon
     
     # Format to datafram
-    df <- data.frame(site_id, lat = lat, lon = lon, woodland_name, area, cons_rate, cons_score, threat_rate, threat_score, ownership )
+    df <- data.frame(site_id, lat = lat, lon = lon, woodland_name, area, cons_rate, cons_score, threat_rate, threat_score, ownership, townland_name)
     
     print(x)
     
@@ -89,9 +89,20 @@ df2 <- do.call(rbind, ls_out(2))
 df3 <- do.call(rbind, ls_out(3))
 df4 <- do.call(rbind, ls_out(4))
 
-df <- rbind(df1,df2,df3,df4) # Binding each data set together
+df <- rbind(df1,df2,df3,df4) # Binding these data together
 df
 str(df)
+
+# Changing empty ownership names to Not Stated
+levels(df$ownership)[levels(df$ownership)==""] <- "Not Stated"
+
+# Taking non-private woods only
+df_non_private <- df %>% 
+  filter(!grepl("Private", ownership)) 
+
+# Taking definite non-private woods
+df_public_confirmed <- df_non_private %>% 
+  filter(!ownership %in% "Not Stated")
 
 # simple plot
 ggplot(df) +
@@ -104,26 +115,32 @@ ggplot(df) +
 m <- leaflet(df) %>%
   addTiles() %>%  # Add default OpenStreetMap map tiles
   addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), 
-             popup = ~paste0(woodland_name, "<br/>Conservation status: ", cons_rate, 
+             popup = ~paste0(woodland_name, 
+                             "<br/>Conservation status: ", cons_rate, 
                              "<br/>Threat status: ", threat_rate, 
                              "<br/>Area (ha): ", area, 
-                             "<br/>Ownership: ", ownership ))
+                             "<br/>Ownership: ", ownership))
 m  # Print the map
 
-# Taking non-private woods only
-df_non_private <-df %>% 
-  filter(!grepl("Private", ownership))
-
-# Map of all woods
+# Map of non private woods
 m_nonpriv <- leaflet(df_non_private) %>%
   addTiles() %>%  # Add default OpenStreetMap map tiles
   addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), 
-             popup = ~paste0(woodland_name, "<br/>Conservation status: ", cons_rate, 
+             popup = ~paste0(woodland_name, 
+                             "<br/>Conservation status: ", cons_rate, 
                              "<br/>Threat status: ", threat_rate, 
                              "<br/>Area (ha): ", area, 
                              "<br/>Ownership: ", ownership ))
 m_nonpriv  # Print the map
 
-
-
+# Map of all non-private woods excluding not stated ownership
+m_public_confirmed <- leaflet(df_public_confirmed) %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), 
+             popup = ~paste0(woodland_name, 
+                             "<br/>Conservation status: ", cons_rate, 
+                             "<br/>Threat status: ", threat_rate, 
+                             "<br/>Area (ha): ", area, 
+                             "<br/>Ownership: ", ownership ))
+m_public_confirmed  # Print the map
 
