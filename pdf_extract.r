@@ -24,6 +24,8 @@ while (i < 5){
 
 pages # Checking vector
 
+txt[[1]]
+
 # Extracting information of interest
 ls_out <- function(pdf_id){
   lapply(2:pages[pdf_id], function(x) {
@@ -39,6 +41,16 @@ ls_out <- function(pdf_id){
     wl_line <- grep("Woodland name", plines)
     wl <- str_squish(plines[wl_line])
     woodland_name <- gsub('^.*Woodland name\\s*|\\s*Townland.*$', '', wl)
+    
+    # Extract whether it is a public or private wood
+    own_line <- grep("Ownership", plines)
+    own <- str_squish(plines[own_line])
+    ownership <- gsub('^.*Ownership\\s*|\\s*Area.*$', '', own)
+    
+    # Field notes
+    nts_line <- grep("Ownership", plines)
+    nts <- str_squish(plines[nts_line])
+    notes <- gsub('^.*External data source: not all data recorded\\s*|\\s*Site no.*$', '', nts)
     
     # Extract Area
     area_line <- grep("Area", plines)
@@ -62,7 +74,7 @@ ls_out <- function(pdf_id){
     lon <- coord$lon
     
     # Format to datafram
-    df <- data.frame(site_id, lat = lat, lon = lon, woodland_name, area, cons_rate, cons_score, threat_rate, threat_score)
+    df <- data.frame(site_id, lat = lat, lon = lon, woodland_name, area, cons_rate, cons_score, threat_rate, threat_score, ownership )
     
     print(x)
     
@@ -94,5 +106,10 @@ m <- leaflet(df) %>%
   addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), 
              popup = ~paste0(woodland_name, "<br/>Conservation status: ", cons_rate, 
                              "<br/>Threat status: ", threat_rate, 
-                             "<br/>Area: ", area, " hectares"))
+                             "<br/>Area (ha): ", area, 
+                             "<br/>Ownership: ", ownership ))
 m  # Print the map
+
+# Taking non-private woods only
+df %>% filter(!grepl("Private", ownership))
+filter(df, !grepl("Private",TrackingPixel))
