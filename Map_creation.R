@@ -1,5 +1,5 @@
 # Reading data 
-readRDS(file = "data_set.rds")
+readRDS(file = "df.rds")
 
 # Setting St. Johns Wood Latitude and Longitude to correct coordinates
 johns_name <- "St John's Wood"
