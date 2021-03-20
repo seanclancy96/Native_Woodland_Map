@@ -1,5 +1,5 @@
 # Reading data 
-readRDS(file = "df.rds")
+df <- readRDS(file = "df.rds")
 
 # Setting St. Johns Wood Latitude and Longitude to correct coordinates
 johns_name <- "St John's Wood"
@@ -59,7 +59,8 @@ m_nonpriv <- leaflet(df_clean_non_private) %>%
 m_public_confirmed <- leaflet(df_clean_public_confirmed) %>%
   addTiles() %>%  # Add default OpenStreetMap map tiles
   addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), 
-             popup = ~paste0(woodland_name, 
+             popup = ~paste0("<font size=3>", '<strong>', woodland_name, '</strong>',
+                             "<font size=2>", 
                              "<br/>Conservation status: ", cons_rate, 
                              "<br/>Threat status: ", threat_rate, 
                              "<br/>Area (ha): ", area, 
