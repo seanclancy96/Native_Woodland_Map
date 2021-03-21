@@ -42,6 +42,11 @@ ls_out <- function(pdf_id){
     wl <- str_squish(plines[wl_line])
     woodland_name <- gsub('^.*Woodland name\\s*|\\s*Townland.*$', '', wl)
     
+    # Extract County
+    co_line <- grep("County", plines)
+    co <- str_squish(plines[co_line])
+    county <- gsub('^.*County\\s*', '', co)
+    
     # Extract townland name
     twn_line <- grep("Townland name", plines)
     twn <- str_squish(plines[twn_line])
@@ -73,10 +78,14 @@ ls_out <- function(pdf_id){
     lat <- coord$lat
     lon <- coord$lon
     
-    # Format to datafram
-    df <- data.frame(site_id, lat = lat, lon = lon, woodland_name, area, cons_rate, cons_score, threat_rate, threat_score, ownership, townland_name)
+    #Field notes
+    fline <- grep("Field notes", plines)
+    desc <- plines[(fline+1):length(plines)]
+    field_notes <- paste0(desc, collapse = " ")
+    field_notes <- gsub("\\r", "", field_notes)
     
-    print(x)
+    # Format to datafram
+    df <- data.frame(site_id, lat = lat, lon = lon, woodland_name, area, cons_rate, cons_score, threat_rate, threat_score, ownership, townland_name, county, field_notes)
     
     return(df[1, ])
     
@@ -92,5 +101,6 @@ df4 <- do.call(rbind, ls_out(4))
 df <- rbind(df1,df2,df3,df4) # Binding these data together
 df
 str(df)
+summary(df)
 
 saveRDS(df, file = "df.rds")
