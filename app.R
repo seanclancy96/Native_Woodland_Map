@@ -44,25 +44,34 @@ ui <- fluidPage(
   
 )
 
+?selectInput()
+
 server <- function(input, output, session) {
   
   output$text <- renderText({
     "John is cool"
   })
   
-  output$map <- renderLeaflet({
-    leaflet(df_clean) %>%
-      # addTiles() %>%  # Add default OpenStreetMap map tiles
-      addProviderTiles(providers$Esri.NatGeoWorldMap,
-                       options = providerTileOptions(noWrap = TRUE)) %>% 
+  output$map <- renderLeaflet({leaflet(df_clean_public_confirmed %>% filter(county %in% input$county)) %>%
+      addTiles() %>%  # Add default OpenStreetMap map tiles
       addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), 
-                 popup = ~paste0(woodland_name, 
+                 popup = ~paste0("<font size=3>", '<strong>', woodland_name, '</strong>',
+                                 "<font size=2>", 
                                  "<br/>Conservation status: ", cons_rate, 
                                  "<br/>Threat status: ", threat_rate, 
                                  "<br/>Area (ha): ", area, 
-                                 "<br/>Ownership: ", ownership))
-  })
+                                 "<br/>Ownership: ", ownership ))})
   
 }
 
 shinyApp(ui, server)
+
+leaflet(df_clean_public_confirmed %>% filter(county %in% "Wexford")) %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), 
+             popup = ~paste0("<font size=3>", '<strong>', woodland_name, '</strong>',
+                             "<font size=2>", 
+                             "<br/>Conservation status: ", cons_rate, 
+                             "<br/>Threat status: ", threat_rate, 
+                             "<br/>Area (ha): ", area, 
+                             "<br/>Ownership: ", ownership ))
