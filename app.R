@@ -32,23 +32,24 @@ df_clean$ownership0 <- ifelse(grepl("private",df_clean$ownership,ignore.case=T),
 
 
 
-ui <- fluidPage(
-  navbarPage("NPWS Forests",
-             tabPanel("Map",
-                      textOutput("text"),
-                      selectInput("county", label = "County", choices = c("All Counties",unique(df_clean$county))),
-                      radioButtons("owner", label = "Ownership", choices = c("All","Public","NPWS")),
-                      leafletOutput("map")
-                      )
-  )
+ui <- bootstrapPage(
+  tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
   
+  leafletOutput("map",width="100%", height ="100%"),
+  
+  
+  absolutePanel(top = 10, right = 10,
+                radioButtons("owner", label = "Ownership", choices = c("All","Public","NPWS")),
+                selectInput("county", label = "County", choices = c("All Counties",unique(df_clean$county))))
 )
+
+  
+  
+
 
 server <- function(input, output, session) {
   
-  output$text <- renderText({
-    "John is cool"
-  })
+
   
  
     
@@ -67,7 +68,9 @@ server <- function(input, output, session) {
                                  "<br/>Conservation status: ", cons_rate, 
                                  "<br/>Threat status: ", threat_rate, 
                                  "<br/>Area (ha): ", area, 
-                                 "<br/>Ownership: ", ownership ))})
+                                 "<br/>Ownership: ", ownership ))}
+    )
+  
   
 }
 
