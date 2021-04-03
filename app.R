@@ -24,20 +24,13 @@ df_clean %>% filter(woodland_name %in% johns_name) # Checking new data frame con
 # Changing empty ownership names to Not Stated
 df_clean$ownership[df_clean$ownership==""] <- "Not Stated"
 
-unique(df_clean["ownership"])
 
 df_clean$ownership0 <- ifelse(grepl("private",df_clean$ownership,ignore.case=T),"Private",
                               ifelse(grepl("coillte|other state body|local authority|Bórd na Móna", df_clean$ownership,ignore.case=T),"Public",
                               ifelse(grepl("npws",df_clean$ownership,ignore.case=T),"NPWS","Unknown")))
 
 
-# Taking non-private woods only
-df_clean_non_private <- df_clean %>% 
-  filter(!grepl("Private", ownership)) 
 
-# Taking definite non-private woods
-df_clean_public_confirmed <- df_clean_non_private %>% 
-  filter(!ownership %in% "Not Stated")
 
 ui <- fluidPage(
   navbarPage("NPWS Forests",
