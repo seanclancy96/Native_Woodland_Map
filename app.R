@@ -43,8 +43,8 @@ ui <- fluidPage(
   navbarPage("NPWS Forests",
              tabPanel("Map",
                       textOutput("text"),
-                      selectInput("county", label = "County", choices = c("State",unique(df_clean$county))),
-                      radioButtons("owner", label = "Ownership", choices = c("All",unique(df_clean$ownership0))),
+                      selectInput("county", label = "County", choices = c("All Counties",unique(df_clean$county))),
+                      radioButtons("owner", label = "Ownership", choices = c("All","Public","NPWS")),
                       leafletOutput("map")
                       )
   )
@@ -57,26 +57,16 @@ server <- function(input, output, session) {
     "John is cool"
   })
   
-  filtered <- reactive({
-    if(input$county=="State" | input$owner =="All" ){
-      m <-df_clean
-    } else if (input$county!="State" | input$county=="All"){
-      m <-df_clean %>% filter(county %in% input$county)
-    }
-    else if (input$county=="State" | input$county!="All"){
-      m <-df_clean %>% filter(ownership0 %in% input$owner)
-    }
-    else {
-      m <- (df_clean %>% filter(county %in% input$county)) %>% filter(ownership0 %in% input$owner)
-    }
-    m
-    
-  })
+ 
     
   
-  output$map <- renderLeaflet({
-    
-    leaflet(filtered) %>%
+  output$map <- renderLeaflet({leaflet(df_clean %>% 
+                filter(if (input$county %in% "All Counties") county %in% county 
+                       else county %in% input$county) %>% 
+                filter(if (input$owner %in% "All") ownership0 %in% ownership0
+                       else if (input$owner %in% "Public") ownership0 %in% c("Public","NPWS")
+                       else ownership0 %in% input$owner)
+    ) %>%
       addTiles() %>%  # Add default OpenStreetMap map tiles
       addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), 
                  popup = ~paste0("<font size=3>", '<strong>', woodland_name, '</strong>',
