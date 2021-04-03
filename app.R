@@ -56,10 +56,10 @@ ui <- fluidPage(
   navbarPage("NPWS Forests",
              tabPanel("Map",
                       textOutput("text"),
-                      selectInput("county", label = "County", choices = unique(df_clean2$county)),
-                      radioButtons("type", label = "Map type", choices = c("Public", "Private")),
-                      #radioButtons("type", label = "Map type", choices = unique(df_clean2$pub_priv)),
-                      leafletOutput("map")
+                      selectInput(inputId = "county", label = "County", choices = c("All counties", unique(df_clean2$county))),
+                      radioButtons(inputId = "type", label = "Map type", choices = c("Public", "All")),
+                      leafletOutput("map"),
+                      textOutput("Description")    
                       )
   )
   
@@ -67,13 +67,13 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
-  output$text <- renderText({
-    "John is cool"
-  })
-  
-  output$map <- renderLeaflet({leaflet(df_clean2 %>% 
-                                         filter(county %in% input$county) %>%  
-                                         filter(pub_priv %in% input$type))  %>% # filtering by user input of county
+    output$map <- renderLeaflet({leaflet(df_clean2 %>% 
+                                         filter(if (input$county %in% "All counties") county %in% county 
+                                                else county %in% input$county) %>% 
+                                            filter(if (input$type %in% c("Public")) pub_priv %in% input$type
+                                                   else pub_priv %in% c("Public", "Private"))
+                                            ) %>% 
+                                         
       addTiles() %>%  # Add default OpenStreetMap map tiles
       addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), 
                  popup = ~paste0("<font size=3>", '<strong>', woodland_name, '</strong>',
@@ -82,8 +82,9 @@ server <- function(input, output, session) {
                                  "<br/>Threat status: ", threat_rate, 
                                  "<br/>Area (ha): ", area, 
                                  "<br/>Ownership: ", ownership ))})
+
   
-}
+  }
 
 shinyApp(ui, server)
 
