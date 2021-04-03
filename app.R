@@ -6,20 +6,20 @@ library(htmltools)
 df <- readRDS(file = "df.rds")
 
 # Setting St. Johns Wood Latitude and Longitude to correct coordinates
-johns_name <- "St John's Wood"
-lat_johns <- 53.556947
-lon_johns <- -8.00471653
+names <- c("St John's Wood","Ellis Wood")
+lats <- c(53.556947,53.551731081502)
+longs <- c(-8.00471653,-9.9475836753845)
 
 # Changing details for St. John's wood
-johns <- df %>% 
-  filter(woodland_name %in% johns_name) %>% 
-  mutate(lat = lat_johns, lon = lon_johns) 
+wronguns <- df %>% 
+  filter(woodland_name %in% names) %>% 
+  mutate(lat = lats, lon = longs) 
 
 df_clean <- df %>% 
-  filter(!woodland_name %in% johns_name) %>% 
-  add_row(johns)
+  filter(!woodland_name %in% names) %>% 
+  add_row(wronguns)
 
-df_clean %>% filter(woodland_name %in% johns_name) # Checking new data frame contains wood of interest
+df_clean %>% filter(woodland_name %in% names) # Checking new data frame contains wood of interest
 
 # Changing empty ownership names to Not Stated
 df_clean$ownership[df_clean$ownership==""] <- "Not Stated"
