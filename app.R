@@ -44,12 +44,21 @@ for (i in 1:nrow(df_clean2)){
   }
 }
 
+# Setting county
+borough <- df_clean2 %>% 
+  filter(county %in% "Borough") %>% 
+  mutate(county = "Dublin")
+
+df_clean3 <- df_clean2 %>% 
+  filter(!county %in% "Borough") %>% 
+  add_row(borough)
+
 # User Interface
 ui <- fluidPage(
   navbarPage("Native Woodlands of Ireland",
              tabPanel("Map",
                       textOutput("text"),
-                      selectInput(inputId = "county", label = "County", choices = c("All counties", unique(df_clean2$county))),
+                      selectInput(inputId = "county", label = "County", choices = c("All counties", unique(df_clean3$county))),
                       radioButtons(inputId = "type", label = "Map type", choices = c("Public", "All")),
                       leafletOutput("map", width = "80%", height = 600),
                       textOutput("Description")    
@@ -61,7 +70,7 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
-    output$map <- renderLeaflet({leaflet(df_clean2 %>% 
+    output$map <- renderLeaflet({leaflet(df_clean3 %>% 
                                          filter(if (input$county %in% "All counties") county %in% county 
                                                 else county %in% input$county) %>% 
                                             filter(if (input$type %in% c("Public")) pub_priv %in% input$type
