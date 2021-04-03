@@ -22,15 +22,11 @@ df_clean <- df %>%
 df_clean %>% filter(woodland_name %in% johns_name) # Checking new data frame contains wood of interest
 
 # Changing empty ownership names to Not Stated
-levels(df_clean$ownership)[levels(df_clean$ownership)==""] <- "Not Stated"
-
-# Taking non-private woods only
-# df_clean_non_private <- df_clean %>% 
-#   filter(!grepl("Private", ownership)) 
-
-# Testing combining filter functions
-# df_clean_pub <- df_clean %>% 
-#  filter(!grepl("Private", ownership) & !ownership %in% "Not Stated") 
+for (i in 1:nrow(df_clean)){  # Looping through rows
+  if (df_clean$ownership[i] == ""){ # If ownership is empty
+    df_clean$ownership[i]<- "Not Stated" # Assign not stated to entry ownership
+  }
+}
 
 # Set a new variable which denotes if it is a public or private wood
 pub_priv <- c("a")
@@ -48,19 +44,17 @@ for (i in 1:nrow(df_clean2)){
   }
 }
 
-# Taking definite non-private woods
-# df_clean_public_confirmed <- df_clean_non_private %>% 
-# filter(!ownership %in% "Not Stated")
-
+# User Interface
 ui <- fluidPage(
-  navbarPage("NPWS Forests",
+  navbarPage("Native Woodlands of Ireland",
              tabPanel("Map",
                       textOutput("text"),
                       selectInput(inputId = "county", label = "County", choices = c("All counties", unique(df_clean2$county))),
                       radioButtons(inputId = "type", label = "Map type", choices = c("Public", "All")),
-                      leafletOutput("map"),
+                      leafletOutput("map", width = "80%", height = 600),
                       textOutput("Description")    
                       )
+                            
   )
   
 )
