@@ -4,14 +4,14 @@ library(leaflet)
 library(htmltools)
 # Reading data 
 df <- readRDS(file = "df.rds")
-wlist=c("Tankardstown South","Ellis Wood")
+wlist=c("Keelrin")
 df[df$woodland_name==wlist,]
 
 
 # Setting incorrect Latitude and Longitude to correct coordinates
-names <- c("St John's Wood","Ellis Wood","Tankardstown South")
-lats <- c(53.556947,53.551731081502,53.747456)
-longs <- c(-8.00471653,-9.9475836753845,-6.6196797)
+names <- c("St John's Wood","Ellis Wood","Tankardstown South","Keelrin")
+lats <- c(53.556947,53.551731081502,53.747456,54.035648143023835)
+longs <- c(-8.00471653,-9.9475836753845,-6.6196797,-7.7092676027534885)
 
 # Changing details for some specific woods (St. John's wood, Phoenix park wood and more)
 wronguns <- df %>% 
@@ -69,7 +69,7 @@ ui <- bootstrapPage(
   absolutePanel(top = 10, right = 10,
                 radioButtons("owner", label = "Ownership", choices = c("All", "Public", "NPWS")),
                 selectInput("county", label = "County", choices = list("All Counties", 
-                                                                       'Connacht'=c("Mayo","Sligo","Leitrim","Galway","Rsocommon"),
+                                                                       'Connacht'=c("Mayo","Sligo","Leitrim","Galway","Roscommon"),
                                                                        'Leinster'= c("Carlow","Dublin","Kildare","Kilkenny","Offaly","Longford","Louth","Meath","Laois","Westmeath","Wexford","Wicklow"),
                                                                        'Munster' = c("Clare","Cork","Kerry","Limerick","Tipperary","Waterford"),
                                                                        'Ulster'  = c("Cavan","Donegal","Monaghan")
