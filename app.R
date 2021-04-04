@@ -21,10 +21,12 @@ ui <- bootstrapPage(
   
   
   absolutePanel(top = 10, right = 10,
-                radioButtons("owner", label = "Ownership", choices = c("All", "Public", "NPWS")),
-                selectInput("county", label = "County", choices = c("All Counties", unique(df_clean$county), 
-                                                                    "Munster", "Leinster", "Connacht", "Ulster"
-                                                                    )))
+                radioButtons("owner", label = "Ownership", choices = c("All", "Public", "NPWS"), width = '180px'),
+                selectInput("county", label = "County", choices = c("All Counties", "Munster", "Leinster", "Connacht", "Ulster",
+                                                                    df_clean$county %>% 
+                                                                      unique() %>% # Taking unique county vals
+                                                                      sort(), # Sorting counties alphabetically to improve navigation
+                                                                    ), width = '180px'))
 )
 
 # Server
