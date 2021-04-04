@@ -4,19 +4,20 @@ library(leaflet)
 library(htmltools)
 # Reading data 
 df <- readRDS(file = "df.rds")
-wlist=c("Keelrin")
-df[df$woodland_name==wlist,]
 
 
 # Setting incorrect Latitude and Longitude to correct coordinates
-names <- c("St John's Wood","Ellis Wood","Tankardstown South","Keelrin")
-lats <- c(53.556947,53.551731081502,53.747456,54.035648143023835)
-longs <- c(-8.00471653,-9.9475836753845,-6.6196797,-7.7092676027534885)
+names <- c("Keelrin","St John's Wood","Tankardstown South","Ellis Wood","Drombane")
+lats <- c(54.035648143023835,53.556947,53.747456,53.551731081502,52.01389139230773)
+longs <- c(-7.7092676027534885,-8.00471653,-6.6196797,-9.9475836753845,-9.882005392670639)
+
+
 
 # Changing details for some specific woods (St. John's wood, Phoenix park wood and more)
 wronguns <- df %>% 
   filter(woodland_name %in% names) %>% 
   mutate(lat = lats, lon = longs) 
+wronguns
 
 borough <- df %>% 
   filter(county %in% "Borough") %>% 
