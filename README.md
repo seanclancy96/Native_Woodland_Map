@@ -7,3 +7,7 @@ https://www.npws.ie/publications/search?title=national%20survey%20of%20native%20
 
 The goal of this project is to extract relevant data from parsing the pdf files and using these data to create a map with the locations of the native woodlands (using coordinates) denoted by pins on an interactive map.
 These pins can then be toggled by the user and more information about the woodland will be visible like the size in hectares, it's quality rating etc...
+
+The shapefile is located here:
+https://data.gov.ie/dataset/national-survey-of-native-woodlands-2003-2008/resource/f84a1220-a521-4ed0-8bce-209098c19500?inner_span=True
+This link also contains a mapping tool where the woodlands' locations can be viewed.
