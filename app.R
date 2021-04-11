@@ -2,6 +2,8 @@ library(shiny)
 library(tidyverse)
 library(leaflet)
 library(htmltools)
+# install.packages("DT")
+library(DT)
 
 # Reading data 
 df_clean <- readRDS(file = "df_clean.rds")
@@ -12,24 +14,31 @@ connacht <- c("Galway", "Leitrim", "Mayo", "Roscommon", "Sligo")
 leinster <- c("Kildare", "Carlow", "Kilkenny", "Laois", "Longford", "Louth", 
               "Meath", "Offaly", "Wexford", "Wicklow", "Westmeath", "Dublin")
 ulster <- c("Monaghan", "Cavan", "Donegal")
+sort(leinster)
 
-# User Interface
-ui <- bootstrapPage(
-  tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
-  
-  leafletOutput("map",width="100%", height ="100%"),
-  
-  
-  absolutePanel(top = 10, right = 10,
-                radioButtons("owner", label = "Ownership", choices = c("All", "Public", "NPWS")),
-                selectInput("county", label = "County", choices = c("All Counties", unique(df_clean$county), 
-                                                                    "Munster", "Leinster", "Connacht", "Ulster"
-                                                                    )))
+# Shape file creation
+# woods <- readOGR("NSNW_Woodland_Habitats_2010.shp")
+# shapeData <- spTransform(woods, CRS("+proj=longlat +ellps=GRS80")) # Transform coordinates
+
+# User interface
+ui <- navbarPage("Native Woodland Map", # id="main",
+                 tabPanel("Map", leafletOutput("map", height=950),
+                          absolutePanel(top = 80, right = 25,
+                                        radioButtons("owner", label = "Ownership", choices = c("All", "Public", "NPWS"), width = '180px'),
+                                        selectInput("county", label = "County", choices = list("All Counties", 
+                                                                                               'Leinster'= sort(leinster), #c("Carlow","Dublin","Kildare","Kilkenny","Offaly","Longford","Louth","Meath","Laois","Westmeath","Wexford","Wicklow"),
+                                                                                               'Munster' = sort(munster), #c("Clare","Cork","Kerry","Limerick","Tipperary","Waterford"),
+                                                                                               'Connacht'= sort(connacht), #c("Mayo","Sligo","Leitrim","Galway","Roscommon"),
+                                                                                               'Ulster'  = sort(ulster) #c("Cavan","Donegal","Monaghan")
+                                                                                               
+                                        ), width = '180px'))),
+                 tabPanel("Data", DT::dataTableOutput("data")),
+                 tabPanel("Read Me", includeMarkdown("README.md"))
 )
 
-# Server
-server <- function(input, output, session) {
 
+server <- function(input, output, session) {
+  
   output$map <- renderLeaflet({leaflet(df_clean %>% 
                                          filter(if (input$county %in% "All Counties") county %in% county 
                                                 else if (input$county %in% "Munster") county %in% munster
@@ -42,7 +51,7 @@ server <- function(input, output, session) {
                                                 else ownership0 %in% input$owner)
   ) %>%
       addTiles() %>%  # Add default OpenStreetMap map tiles
-      addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), 
+      addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), clusterOptions = markerClusterOptions(),
                  popup = ~paste0("<font size=3>", '<strong>', woodland_name, '</strong>',
                                  "<font size=2>", 
                                  "<br/>Conservation status: ", cons_rate, 
@@ -50,7 +59,31 @@ server <- function(input, output, session) {
                                  "<br/>Area (ha): ", area, 
                                  "<br/>Ownership: ", ownership ))}
   )
-
+  
+  output$data <- DT::renderDataTable(datatable(
+    df_clean[,-c(13,14)], filter = 'top',
+    colnames = c("Side ID", "Latitude", "Longitude", "Woodland Name", "Area", "Conservation Rating", "Conservation Score", 
+                 "Threat Rating", "Threat Score", "Ownership", "Townland Name", "County")
+  )
+  )
+  
 }
 
 shinyApp(ui, server)
+
+# download.file("http://www.npws.ie/sites/default/files/general/nsnw.zip", "shapefiles.zip")
+# unzip("shapefiles.zip")
+# 
+# library(rgdal)  
+# # for metadata/attributes- vectors or rasters
+# library(raster) 
+# 
+# woods <- readOGR("NSNW_Woodland_Habitats_2010.shp")
+# shapeData <- spTransform(woods, CRS("+proj=longlat +ellps=GRS80")) # Transform coordinates
+# 
+# library(leaflet)
+# leaflet() %>% addTiles() %>% 
+#   addPolygons(data = shapeData,weight = 5,col = 'red')
+
+
+
