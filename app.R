@@ -4,6 +4,9 @@ library(leaflet)
 library(htmltools)
 # install.packages("DT")
 library(DT)
+library(rgdal)
+# for metadata/attributes- vectors or rasters
+library(raster)
 
 # Reading data 
 df_clean <- readRDS(file = "df_clean.rds")
@@ -17,8 +20,8 @@ ulster <- c("Monaghan", "Cavan", "Donegal")
 sort(leinster)
 
 # Shape file creation
-# woods <- readOGR("NSNW_Woodland_Habitats_2010.shp")
-# shapeData <- spTransform(woods, CRS("+proj=longlat +ellps=GRS80")) # Transform coordinates
+woods <- readOGR("NSNW_Woodland_Habitats_2010.shp")
+shapeData <- spTransform(woods, CRS("+proj=longlat +ellps=GRS80")) # Transform coordinates
 
 # User interface
 ui <- navbarPage("Native Woodland Map", # id="main",
@@ -26,30 +29,33 @@ ui <- navbarPage("Native Woodland Map", # id="main",
                           absolutePanel(top = 80, right = 25,
                                         radioButtons("owner", label = "Ownership", choices = c("All", "Public", "NPWS"), width = '180px'),
                                         selectInput("county", label = "County", choices = list("All Counties", 
-                                                                                               'Leinster'= sort(leinster), #c("Carlow","Dublin","Kildare","Kilkenny","Offaly","Longford","Louth","Meath","Laois","Westmeath","Wexford","Wicklow"),
-                                                                                               'Munster' = sort(munster), #c("Clare","Cork","Kerry","Limerick","Tipperary","Waterford"),
-                                                                                               'Connacht'= sort(connacht), #c("Mayo","Sligo","Leitrim","Galway","Roscommon"),
-                                                                                               'Ulster'  = sort(ulster) #c("Cavan","Donegal","Monaghan")
+                                                                                               'Leinster'= sort(leinster), 
+                                                                                               'Munster' = sort(munster), 
+                                                                                               'Connacht'= sort(connacht), 
+                                                                                               'Ulster'  = sort(ulster) 
                                                                                                
                                         ), width = '180px'))),
                  tabPanel("Data", DT::dataTableOutput("data")),
-                 tabPanel("Read Me", includeMarkdown("README.md"))
+                 tabPanel("Read Me", includeMarkdown("README.md")),
+                 tabPanel("Shape Map", leafletOutput("shape", height=950))
 )
 
 
 server <- function(input, output, session) {
   
-  output$map <- renderLeaflet({leaflet(df_clean %>% 
-                                         filter(if (input$county %in% "All Counties") county %in% county 
-                                                else if (input$county %in% "Munster") county %in% munster
-                                                else if (input$county %in% "Leinster") county %in% leinster
-                                                else if (input$county %in% "Connacht") county %in% connacht
-                                                else if (input$county %in% "Ulster") county %in% ulster
-                                                else county %in% input$county) %>% 
-                                         filter(if (input$owner %in% "All") ownership0 %in% ownership0
-                                                else if (input$owner %in% "Public") ownership0 %in% c("Public", "NPWS")
-                                                else ownership0 %in% input$owner)
-  ) %>%
+  output$map <- renderLeaflet({
+    leaflet(df_clean %>% 
+              filter(if (input$county %in% "All Counties") county %in% county 
+                     else if (input$county %in% "Munster") county %in% munster
+                     else if (input$county %in% "Leinster") county %in% leinster
+                     else if (input$county %in% "Connacht") county %in% connacht
+                     else if (input$county %in% "Ulster") county %in% ulster
+                     else county %in% input$county) %>% 
+              filter(if (input$owner %in% "All") ownership0 %in% ownership0
+                     else if (input$owner %in% "Public") ownership0 %in% c("Public", "NPWS")
+                     else ownership0 %in% input$owner)
+            
+    ) %>%
       addTiles() %>%  # Add default OpenStreetMap map tiles
       addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), clusterOptions = markerClusterOptions(),
                  popup = ~paste0("<font size=3>", '<strong>', woodland_name, '</strong>',
@@ -57,7 +63,10 @@ server <- function(input, output, session) {
                                  "<br/>Conservation status: ", cons_rate, 
                                  "<br/>Threat status: ", threat_rate, 
                                  "<br/>Area (ha): ", area, 
-                                 "<br/>Ownership: ", ownership ))}
+                                 "<br/>Ownership: ", ownership ))
+  }
+  
+  
   )
   
   output$data <- DT::renderDataTable(datatable(
@@ -65,25 +74,14 @@ server <- function(input, output, session) {
     colnames = c("Side ID", "Latitude", "Longitude", "Woodland Name", "Area", "Conservation Rating", "Conservation Score", 
                  "Threat Rating", "Threat Score", "Ownership", "Townland Name", "County")
   )
+)
+  
+  output$shape <- renderLeaflet(
+    leaflet() %>% 
+      addTiles() %>%
+      addPolygons(data = shapeData, weight = 5, col = 'red')
   )
   
 }
 
 shinyApp(ui, server)
-
-# download.file("http://www.npws.ie/sites/default/files/general/nsnw.zip", "shapefiles.zip")
-# unzip("shapefiles.zip")
-# 
-# library(rgdal)  
-# # for metadata/attributes- vectors or rasters
-# library(raster) 
-# 
-# woods <- readOGR("NSNW_Woodland_Habitats_2010.shp")
-# shapeData <- spTransform(woods, CRS("+proj=longlat +ellps=GRS80")) # Transform coordinates
-# 
-# library(leaflet)
-# leaflet() %>% addTiles() %>% 
-#   addPolygons(data = shapeData,weight = 5,col = 'red')
-
-
-
