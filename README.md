@@ -1,4 +1,4 @@
-                                                           ## Map of Native Woodlands in Ireland using NPWS data.
+## Map of Native Woodlands in Ireland using NPWS data.
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -11,7 +11,8 @@ https://www.npws.ie/publications/search?title=national%20survey%20of%20native%20
 The information for the pin map and data table was scraped from these pdf documents.
 These pins can then be toggled by the user and more information about the woodland will be visible like the size in hectares, it's conservation status etc.
 
-The shapefile map data was pulled from gov.ie
+The shapefile map data was pulled from here:                                                                                                                                              
+
 https://data.gov.ie/dataset/national-survey-of-native-woodlands-2003-2008/resource/f84a1220-a521-4ed0-8bce-209098c19500?inner_span=True                                     
 This link also contains a mapping tool where the woodlands' locations can be viewed.
 
