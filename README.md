@@ -1,7 +1,3 @@
-## Map of Native Woodlands in Ireland using NPWS data.
-
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 ## Data 
 
 The National Parks and Wildlife Service completed a national survey of Native Woodlands in the Republic of Ireland between 2003 and 2008.
