@@ -7,9 +7,7 @@ The information for the pin map and data table was scraped from these pdf docume
 These pins can then be toggled by the user and more information about the woodland will be visible like the size in hectares, it's conservation status etc.
 
 The shapefile map data was pulled from [gov.ie](https://data.gov.ie/dataset/national-survey-of-native-woodlands-2003-2008/resource/f84a1220-a521-4ed0-8bce-209098c19500?inner_span=True). This link also contains a mapping tool where the woodlands' locations can be viewed.
-
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-                                                                                                                                        
+                                                                                                                                       
 ## Limitations
 
 The pin map scraped the townland names from the pdfs for latitude and longitude.                                                                                          
