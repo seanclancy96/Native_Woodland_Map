@@ -19,12 +19,17 @@ leinster <- c("Kildare", "Carlow", "Kilkenny", "Laois", "Longford", "Louth",
 ulster <- c("Monaghan", "Cavan", "Donegal")
 sort(leinster)
 
+# Taking county vals from NPWS filtering to use an error message
+NPWS_vals <- df_clean %>% 
+  filter(ownership0 %in% "NPWS") 
+NPWS_counties <- unique(NPWS_vals$county)
+
 # Shape file creation
-woods <- readOGR("NSNW_Woodland_Habitats_2010.shp")
-shapeData <- spTransform(woods, CRS("+proj=longlat +ellps=GRS80")) # Transform coordinates
+# woods <- readOGR("NSNW_Woodland_Habitats_2010.shp")
+# shapeData <- spTransform(woods, CRS("+proj=longlat +ellps=GRS80")) # Transform coordinates
 
 # User interface
-ui <- navbarPage("Native Woodland Map", # id="main",
+ui <- navbarPage("Native Woodlands", # id="main",
                  tabPanel("Map", leafletOutput("map", height=950),
                           absolutePanel(top = 80, right = 25,
                                         radioButtons("owner", label = "Ownership", choices = c("All", "Public", "NPWS"), width = '180px'),
@@ -36,15 +41,20 @@ ui <- navbarPage("Native Woodland Map", # id="main",
                                                                                                
                                         ), width = '180px'))),
                  tabPanel("Data", DT::dataTableOutput("data")),
-                 tabPanel("Read Me", includeMarkdown("README.md")),
-                 tabPanel("Shape Map", leafletOutput("shape", height=950))
+                 tabPanel("Read Me", includeMarkdown("README.md"))#,
+                 # tabPanel("Shape Map", leafletOutput("shape", height=950))
 )
 
 
 server <- function(input, output, session) {
   
   output$map <- renderLeaflet({
-    leaflet(df_clean %>% 
+    leaflet(
+      if (input$owner %in% "NPWS" && !input$county %in% NPWS_counties) {
+        df_clean
+      }
+      else
+        df_clean %>% 
               filter(if (input$county %in% "All Counties") county %in% county 
                      else if (input$county %in% "Munster") county %in% munster
                      else if (input$county %in% "Leinster") county %in% leinster
@@ -56,6 +66,7 @@ server <- function(input, output, session) {
                      else ownership0 %in% input$owner)
             
     ) %>%
+      
       addTiles() %>%  # Add default OpenStreetMap map tiles
       addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), clusterOptions = markerClusterOptions(),
                  popup = ~paste0("<font size=3>", '<strong>', woodland_name, '</strong>',
@@ -66,8 +77,7 @@ server <- function(input, output, session) {
                                  "<br/>Ownership: ", ownership ))
   }
   
-  
-  )
+)
   
   output$data <- DT::renderDataTable(datatable(
     df_clean[,-c(13,14)], filter = 'top',
@@ -76,11 +86,11 @@ server <- function(input, output, session) {
   )
 )
   
-  output$shape <- renderLeaflet(
-    leaflet() %>% 
-      addTiles() %>%
-      addPolygons(data = shapeData, weight = 5, col = 'red')
-  )
+  # output$shape <- renderLeaflet(
+  #   leaflet() %>% 
+  #     addTiles() %>%
+  #     addPolygons(data = shapeData, weight = 5, col = 'red')
+  # )
   
 }
 
