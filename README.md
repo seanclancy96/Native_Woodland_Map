@@ -12,4 +12,4 @@ The shapefile map data was pulled from [gov.ie](https://data.gov.ie/dataset/nati
 
 The pin map scraped the townland names from the pdfs for latitude and longitude.                                                                                          
 Some data points on the shapefile map have different location data. The locations of these woods (<5%) may be incorrect in the initial map.  
-Amendments to these locations may be made over time.
+Amendments to these locations will be made over time.
