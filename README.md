@@ -8,4 +8,4 @@ The code for this project can be viewed on [github](https://github.com/JohnMulla
 
 ## Limitations
 
-The map scraped the townland names from the pdfs for latitude and longitude. [gov.ie](https://data.gov.ie/dataset/national-survey-of-native-woodlands-2003-2008) also hosts a data of this woodland survey. The link contains a mapping tool where the woodlands' locations can be viewed. Some woodland locations on the [gov.ie](https://data.gov.ie/dataset/national-survey-of-native-woodlands-2003-2008) map are different to this map. Amendments to these locations will be made over time.
+The map scraped the townland names from the pdfs for latitude and longitude. [gov.ie](https://data.gov.ie/dataset/national-survey-of-native-woodlands-2003-2008) also hosts data from this woodland survey. The link contains a mapping tool where the woodlands' locations can be viewed. Some woodland locations on the [gov.ie](https://data.gov.ie/dataset/national-survey-of-native-woodlands-2003-2008) map are different to this map. Amendments to these locations will be made over time.

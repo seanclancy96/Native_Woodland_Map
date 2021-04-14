@@ -50,7 +50,7 @@ server <- function(input, output, session) {
   
   output$map <- renderLeaflet({
     leaflet(
-      if (input$owner %in% "NPWS" && !input$county %in% NPWS_counties) {
+      if (input$owner %in% "NPWS" && !input$county %in% c(NPWS_counties, "All Counties")) {
         df_clean
       }
       else
