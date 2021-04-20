@@ -27,6 +27,10 @@ NPWS_counties <- unique(NPWS_vals$county)
 # Shape file creation
 # woods <- readOGR("NSNW_Woodland_Habitats_2010.shp")
 # shapeData <- spTransform(woods, CRS("+proj=longlat +ellps=GRS80")) # Transform coordinates
+# ?absolutePanel
+# ?actionButton
+# icon()
+# ?checkboxInput
 
 # User interface
 ui <- navbarPage("Native Woodlands", # id="main",
@@ -37,11 +41,12 @@ ui <- navbarPage("Native Woodlands", # id="main",
                                                                                                'Leinster'= sort(leinster), 
                                                                                                'Munster' = sort(munster), 
                                                                                                'Connacht'= sort(connacht), 
-                                                                                               'Ulster'  = sort(ulster) 
-                                                                                               
-                                        ), width = '180px'))),
+                                                                                               'Ulster'  = sort(ulster)), width = '180px'), 
+                                        # selectInput("notes", label = "Field Notes", choices = c("Disabled", "Enabled"), width = '180px'),  
+                                        width = '180px')),                                        
                  tabPanel("Data", DT::dataTableOutput("data")),
-                 tabPanel("Read Me", includeMarkdown("README.md"))#,
+                 tabPanel("Information", includeMarkdown("README.md"))
+                 #,
                  # tabPanel("Shape Map", leafletOutput("shape", height=950))
 )
 
@@ -68,15 +73,34 @@ server <- function(input, output, session) {
     ) %>%
       
       addTiles() %>%  # Add default OpenStreetMap map tiles
-      addMarkers(~lon, ~lat, label = ~htmlEscape(woodland_name), clusterOptions = markerClusterOptions(),
-                 popup = ~paste0("<font size=3>", '<strong>', woodland_name, '</strong>',
-                                 "<font size=2>", 
-                                 "<br/>Conservation status: ", cons_rate, 
-                                 "<br/>Threat status: ", threat_rate, 
-                                 "<br/>Area (ha): ", area, 
-                                 "<br/>Ownership: ", ownership ))
+      
+        addMarkers(
+          # reactive(if (x() %in% "Disabled")
+          ~lon, ~lat, label = ~htmlEscape(woodland_name), clusterOptions = markerClusterOptions(),
+                   popup = ~paste0("<font size=3>", '<strong>', woodland_name, '</strong>',
+                                   "<font size=2>", 
+                                   "<br/>Conservation status: ", cons_rate, 
+                                   "<br/>Threat status: ", threat_rate, 
+                                   "<br/>Area (ha): ", area, 
+                                   "<br/>Ownership: ", ownership,
+                                   "<br/><br/>Field Notes: <br/>", "<font size=1>", field_notes)
+                                   #if (input$notes %in% "Enabled"){
+                                    # ,
+                                     #"<br/>Field Notes: <br/>", field_notes})  
+      #}
+      
+    # else
+        
+      # ~lon, ~lat, label = ~htmlEscape(woodland_name), clusterOptions = markerClusterOptions(),
+      #            popup = ~paste0("<font size=3>", '<strong>', woodland_name, '</strong>',
+      #                            "<font size=2>",
+      #                            "<br/>Conservation status: ", cons_rate,
+      #                            "<br/>Threat status: ", threat_rate,
+      #                            "<br/>Area (ha): ", area,
+      #                            "<br/>Ownership: ", ownership ,
+      #                            "<br/>Field Notes: <br/>", field_notes)
+)
   }
-  
 )
   
   output$data <- DT::renderDataTable(datatable(
