@@ -1,3 +1,12 @@
+# install.packages('rsconnect')
+# 
+# rsconnect::setAccountInfo(name='johnmullane',
+#                           token='E14FFDCBCE45C038FA23130DF0DDC722',
+#                           secret='xL+g04RX63I/sfIygdAPwkTH/yq9lucSiDoQRdxh')
+# 
+# library(rsconnect)
+# rsconnect::deployApp('~/Native_Woodland_Map')
+
 library(shiny)
 library(tidyverse)
 library(leaflet)
